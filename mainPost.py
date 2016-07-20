@@ -18,8 +18,17 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from openpyxl import load_workbook
 import pylab
+from mainAnalysis import *
+#-------------------------------------------------------------------------------
+# 绘图参数设置
+#-------------------------------------------------------------------------------
 pylab.mpl.rcParams['font.sans-serif'] = ['SimHei'] #指定默认字体    
 pylab.mpl.rcParams['axes.unicode_minus'] = False #解决保存图像是负号'-'显示为方块的问题 
+pylab.mpl.rcParams['font.size'] = 10.5
+pylab.mpl.rcParams['legend.fontsize'] = u'small'
+pylab.mpl.rcParams['xtick.labelsize']=u'small'
+pylab.mpl.rcParams['ytick.labelsize']=u'small'
+#-------------------------------------------------------------------------------
 def dat2out(name):
 	if os.path.exists('TestRES\\'+name+'.out'):
 		data=np.loadtxt('TestRES\\'+name+'.out',skiprows =1)
@@ -263,23 +272,33 @@ def MyHys2(h,b,ds,ns,m,At,nt,s,P,L):
 #-------------------------------------------------------------------------------
 # 绘图
 #-------------------------------------------------------------------------------
-#nlist=['C2','C3']
-#for name in nlist:
-#	#name='C2'
-#	data=dat2out(name)
-#	(preD,preF)=MyHys(name)	
-#	xx=data[:,1]
-#	yy=data[:,2]
-#	fig=Figure()
-#	fig.set_size_inches(10,10)
-#	cv=FigureCanvas(fig)
-#	ax=fig.add_axes([0.14, 0.14, 0.8, 0.6])
-#	ax.grid(True)
-#	ax.plot(preD,preF/1000,xx,yy)
-#	cv.print_figure(name+'.png',dpi=300)
+def pro2cap(name='C2'):
+	fig=Figure()
+	fig = plt.figure(figsize=(5, 3.75))
+	ax=fig.add_axes([0.16, 0.13, 0.74, 0.77])
+	ax.grid(True)
+	cv=FigureCanvas(fig)
+	yield_disp=6
+	data=np.loadtxt(r'TestRES\\'+name+'.out',skiprows =1)
+	disp=data[:,1]/yield_disp
+	force=data[:,2]
+	bb=bacbone(name)
+	x1=bb[:,1]/yield_disp
+	f1=bb[:,2]
+	(Vp,Vs,Va)=SheerEQNS(name,fc=58.0)
+	bbplot=ax.plot(x1,f1,linewidth=1.5,color='k')
+	priplot=ax.plot(Vp[:,0],Vp[:,1]/1000,-Vp[:,0],-Vp[:,1]/1000,linewidth=1,color='r')
+	senplot=ax.plot(Vs[:,0],Vs[:,1]/1000,-Vs[:,0],-Vs[:,1]/1000,linewidth=1,color='b')
+	aciplot=ax.plot(Va[:,0],Va[:,1]/1000,-Va[:,0],-Va[:,1]/1000,linewidth=1,color='g')
+	#df=ax.plot(disp,force,linewidth=1)
+	ax.set_xlabel(u'延性系数')
+	ax.set_ylabel(u'侧向力[kN]')	
+	le=ax.legend([bbplot[0],aciplot[0],priplot[0],senplot[0]],
+		[u'骨架曲线',u'ACI318-规范',u'Priestly抗剪能力',u'Sezen抗剪能力'],
+		loc='upper left', fancybox=True, shadow=True,numpoints=1)
+	cv.print_figure(name+'.png',dpi=300)
+	return
 #-------------------------------------------------------------------------------
 # 滞回预测
 #-------------------------------------------------------------------------------
-#name='G1'
-##data=dat2out(name)
-#(preD,preF)=MyHys(name)
+pro2cap('E2')

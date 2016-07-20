@@ -5,7 +5,6 @@
 # Author: Bill
 # Created: 23/5/2016
 #-------------------------------------------------------------------------------
-from mainPost import *
 from openpyxl import load_workbook
 import glob
 import matplotlib.gridspec as gridspec
@@ -380,7 +379,7 @@ def PreDic(spi='C2',fc=58.0):
 #-------------------------------------------------------------------------------
 # 单独试件的Priestely剪力
 #-------------------------------------------------------------------------------
-def Priestely(spi='C2',fc=58.0):
+def SheerEQNS(spi='C2',fc=58.0):
 	#spi='G-2'
 	c=30
 	size=10
@@ -407,34 +406,36 @@ def Priestely(spi='C2',fc=58.0):
 			Vpri1=pri(b,h,c,At,nt,fyt,fc,s,P,L)
 			Vpri2=pri2(b,h,c,At,nt,fyt,fc,s,P,L)
 			Vsezen=sezen(b,h,c,At,nt,fyt,fc,s,P,L)
+			Vai=vaci(b,h,c,At,nt,fyt,fc,s,P)
 			V1=[0.,Vpri1]
 			V2=[2.0,Vpri1]
 			V3=[4.0,Vpri2]
 			V4=[6.0,Vpri2]
 			Vpr=np.array([V1,V2,V3,V4])
 			Vse=np.array([[0.,Vsezen],[6.0,Vsezen]])
+			Vaci=np.array([[0.,Vai],[6.0,Vai]])
 			break
-	return (Vpr,Vse)
+	return (Vpr,Vse,Vaci)
 #-------------------------------------------------------------------------------
 # 3x3图像
 #-------------------------------------------------------------------------------
 #nameLis=['C-1','C-2','C-3']
 #nameLis=['C-2','D-1','D-2','D-3']
 #nameLis=['C-2','D-2','G-1','G-2','G-3','G-4']
-nameLis=['C1','C2','C3','E1','E2','G1','G2','D1','D2','D3','F1','F2']
-nn=0
-plt.figure(1,figsize=(20,20))
-for name in nameLis:
-	(L3,L1)=Priestely(name,fc=58.0)
-	(pD,pF)=MyHys(name)
-	fmax=max(pF)
-	nn=nn+1
-	plt.subplot(4,4,nn)
-	plt.plot([0,6],[fmax,fmax],'b',linewidth=2)
-	plt.plot(L3[:,0],L3[:,1],'r')
-	plt.plot(L1[:,0],L1[:,1],'r',alpha=0.5)
-	plt.title('Predict of %s'%(name))
-plt.savefig(u'PyRES\\'+''.join(nameLis)+'.png', dpi=300)
+#nameLis=['C1','C2','C3','E1','E2','G1','G2','D1','D2','D3','F1','F2']
+#nn=0
+#plt.figure(1,figsize=(20,20))
+#for name in nameLis:
+#	(L3,L1)=Priestely(name,fc=58.0)
+#	(pD,pF)=MyHys(name)
+#	fmax=max(pF)
+#	nn=nn+1
+#	plt.subplot(4,4,nn)
+#	plt.plot([0,6],[fmax,fmax],'b',linewidth=2)
+#	plt.plot(L3[:,0],L3[:,1],'r')
+#	plt.plot(L1[:,0],L1[:,1],'r',alpha=0.5)
+#	plt.title('Predict of %s'%(name))
+#plt.savefig(u'PyRES\\'+''.join(nameLis)+'.png', dpi=300)
 #-------------------------------------------------------------------------------
 # 钢筋矩阵
 #-------------------------------------------------------------------------------
